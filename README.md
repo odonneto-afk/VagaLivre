@@ -15,7 +15,6 @@ Facilitar a localização de vagas de estacionamento, utilizando tecnologia para
 - Exibição de data e hora da última atualização  
 
 ## 🛠️ Tecnologias Utilizadas
-- Python (processamento de imagens)  
 - PHP (backend)  
 - JavaScript / jQuery (frontend)  
 - MySQL (banco de dados)  
