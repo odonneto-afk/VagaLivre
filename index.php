@@ -1,364 +1,224 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VagaLivre - Acesso</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
-
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-dark: #2b5876;
-            --primary-light: #4e4376;
-            --accent-green: #2ecc71;
-            --white: #FFFFFF;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            font-family: 'Montserrat', sans-serif;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Evitamos assim o  scroll indesejado na animação */
-        }
-
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        .logo-icon {
-            font-size: 24px;
-            color: var(--primary-dark);
-            margin-right: 8px;
-            position: relative;
-        }
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            top: 0; right: -2px; width: 6px; height: 6px;
-            background-color: var(--accent-green);
-            border-radius: 50%; border: 2px solid var(--white);
-        }
-        .logo-text {
-            font-size: 22px; font-weight: 800; color: var(--primary-dark); letter-spacing: -1px;
-        }
-        .logo-text span { color: var(--accent-green); font-weight: 600; }
-
-
-        .overlay .logo-icon { color: var(--white); }
-        .overlay .logo-icon::after { border-color: var(--primary-light); }
-        .overlay .logo-text { color: var(--white); }
-
-
-        .container {
-            background-color: #fff;
-            border-radius: 20px;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-            position: relative;
-            overflow: hidden;
-            width: 800px;
-            max-width: 100%;
-            min-height: 500px; /* Aqui fica a altura quando for desktop */
-        }
-
-        .form-container {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            transition: all 0.6s ease-in-out;
-        }
-
-
-        form {
-            background-color: #FFFFFF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            padding: 0 50px;
-            height: 100%;
-            text-align: center;
-        }
-        
-        h1 { margin: 0; font-size: 24px; }
-        p { font-size: 14px; font-weight: 100; line-height: 20px; letter-spacing: 0.5px; margin: 20px 0 30px; }
-        span.sub-text { font-size: 12px; margin-bottom: 10px; }
-        
-        input {
-            background-color: #eee;
-            border: none;
-            padding: 12px 15px;
-            margin: 8px 0;
-            width: 100%;
-            border-radius: 8px;
-        }
-        .plate-input {
-            text-transform: uppercase;
-            font-family: monospace;
-            letter-spacing: 2px;
-            font-weight: bold;
-            border-left: 5px solid var(--accent-green);
-        }
-
-        button {
-            border-radius: 20px;
-            border: 1px solid var(--primary-light);
-            background-color: var(--primary-light);
-            color: #FFFFFF;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 12px 45px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: transform 80ms ease-in;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:active { transform: scale(0.95); }
-        button:focus { outline: none; }
-        button.ghost { background-color: transparent; border-color: #FFFFFF; }
-
-
-        .sign-in-container {
-            left: 0; width: 50%; z-index: 2;
-        }
-        .container.right-panel-active .sign-in-container {
-            transform: translateX(100%);
-        }
-        .sign-up-container {
-            left: 0; width: 50%; opacity: 0; z-index: 1;
-        }
-        .container.right-panel-active .sign-up-container {
-            transform: translateX(100%); opacity: 1; z-index: 5; animation: show 0.6s;
-        }
-        @keyframes show {
-            0%, 49.99% { opacity: 0; z-index: 1; }
-            50%, 100% { opacity: 1; z-index: 5; }
-        }
-
-
-        .overlay-container {
-            position: absolute; top: 0; left: 50%; width: 50%; height: 100%;
-            overflow: hidden; transition: transform 0.6s ease-in-out; z-index: 100;
-        }
-        .container.right-panel-active .overlay-container { transform: translateX(-100%); }
-        
-        .overlay {
-            background: linear-gradient(to right, var(--primary-dark), var(--primary-light));
-            background-repeat: no-repeat; background-size: cover; background-position: 0 0;
-            color: #FFFFFF; position: relative; left: -100%; height: 100%; width: 200%;
-            transform: translateX(0); transition: transform 0.6s ease-in-out;
-        }
-        .container.right-panel-active .overlay { transform: translateX(50%); }
-
-        .overlay-panel {
-            position: absolute; display: flex; align-items: center; justify-content: center;
-            flex-direction: column; padding: 0 40px; text-align: center; top: 0; height: 100%; width: 50%;
-            transform: translateX(0); transition: transform 0.6s ease-in-out;
-        }
-        .overlay-left { transform: translateX(-20%); }
-        .container.right-panel-active .overlay-left { transform: translateX(0); }
-        .overlay-right { right: 0; transform: translateX(0); }
-        .container.right-panel-active .overlay-right { transform: translateX(20%); }
-
-
-        /* Parte do mobile */
-        @media (max-width: 768px) {
-            
-            .container {
-                width: 90vw; /* Largura boa no mobile */
-                height: 85vh; /* Altura quase que total */
-                min-height: auto;
-                max-width: 400px; /* Limite para tablets */
-                border-radius: 15px;
-            }
-
-            form { padding: 0 30px; }
-            h1 { font-size: 20px; }
-
-            .sign-in-container, .sign-up-container {
-                width: 100%;
-                height: 70%;
-                top: 0;
-                left: 0;
-            }
-
-
-            .container.right-panel-active .sign-in-container { transform: translateY(100%); }
-            .container.right-panel-active .sign-up-container { transform: translateY(0); }
-            
-
-            .overlay-container {
-                width: 100%;
-                height: 30%;
-                top: 70%;
-                left: 0;
-                right: 0;
-            }
-            
-            /* Quando ta ativo, o overlay corre e sobe para o TOPO */
-            .container.right-panel-active .overlay-container {
-                transform: translateY(-233%);
-                transform: translateY(-233%); 
-            }
-            
-            .container.right-panel-active .overlay-container {
-                transform: translateY(-233%); 
-            }
-
-            .overlay {
-                width: 100%;
-                height: 200%;
-                left: 0;
-                top: -100%; 
-                flex-direction: column;
-                transform: translateY(0);
-            }
-            
-            .container.right-panel-active .overlay {
-                transform: translateY(50%);
-            }
-
-            /* Painéis de texto dentro do Overlay */
-            .overlay-panel {
-                width: 100%;
-                height: 50%; /* Ajusta para cada painel ocupar metade da altura do overlay */
-                padding: 0 20px;
-            }
-
-            .overlay-left { 
-                top: 0; 
-                transform: translateY(-20%); 
-            }
-            .overlay-right { 
-                top: auto; 
-                bottom: 0; 
-                right: auto;
-                transform: translateY(0); 
-            }
-
-            /* Animações de texto quando for mobile */
-            .container.right-panel-active .overlay-left { transform: translateY(0); }
-            .container.right-panel-active .overlay-right { transform: translateY(20%); }
-
-            /* Ajuste de correção da posição dos forms na animação */
-            .sign-up-container {
-                top: auto;
-                bottom: 0; /* Começa na parte de baixo quando for mobile */
-                transform: translateY(0);
-            }
-            
-            /* Estado inicial do login com form em cima e overlay em baixo */
-            .sign-in-container { top: 0; height: 70%; }
-            .sign-up-container { top: 30%; height: 70%; opacity: 0; z-index: 0;}
-            
-            /* Estado ativo de cadastro  com overlay em cima e form em baixo */
-            .container.right-panel-active .sign-in-container {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            .container.right-panel-active .sign-up-container {
-                transform: translateY(0); 
-                top: 30%; 
-                opacity: 1;
-                z-index: 5;
-                animation: none;
-            }
-
-
-            /* Quando for login o overlay está em top: 70% */
-            /* Qjando for cadastro o overlay deve ir para top: 0% */
-            
-            .container.right-panel-active .overlay-container {
-                transform: translateY(-233%); 
-            }
-        }
-
-        /* Ajuste para telas muito pequenas */
-        @media (max-height: 600px) and (max-width: 768px) {
-            .container { height: 95vh; }
-            h1 { font-size: 18px; margin-bottom: 5px;}
-            p { margin: 10px 0; font-size: 12px; }
-            .logo-container { margin-bottom: 5px; }
-            input { padding: 8px 15px; margin: 4px 0; }
-        }
-    </style>
-</head>
+<?php include("./topo.php"); ?>
 <body>
 
-<div class="container" id="container">
-    
-    <div class="form-container sign-up-container">
-        <form action="#" method="post">
-            <div class="logo-container">
-                <i class="fas fa-car-side logo-icon"></i>
-                <div class="logo-text">Vaga<span>Livre</span></div>
-            </div>
-            <h1>Criar Conta</h1>
-            <input type="text" name="nome" placeholder="Nome" />
-            <input type="email" name="whatsapp" placeholder="Whatsapp" />
-            <input type="email" name="email" placeholder="Email" />
-            <input type="password" name="senha" placeholder="Senha" />
-            <input type="password" name="confsenha" placeholder="Confirmação de Senha" />
-            <button>Cadastrar</button>
-        </form>
+    <div class="menu-btn"><i class="fas fa-bars" style="color:var(--primary-dark)"></i></div>
+
+    <div id="map-container">
+        <svg class="custom-map-svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice">
+            <rect width="200" height="200" fill="#e3e8ee"/>
+            <path d="M80 -10 L120 210" stroke="white" stroke-width="14"/>
+            <path d="M-10 80 L210 120" stroke="white" stroke-width="12"/>
+            <path d="M30 -10 L70 210" stroke="white" stroke-width="6"/>
+            <path d="M130 -10 L170 210" stroke="white" stroke-width="6"/>
+            <path d="M-10 30 L210 70" stroke="white" stroke-width="5"/>
+            <path d="M-10 130 L210 170" stroke="white" stroke-width="5"/>
+            <rect x="125" y="95" width="20" height="20" fill="#d1d9e6" rx="2"/>
+        </svg>
+
+        <div class="map-label" style="top:40%; left:52%; transform:rotate(10deg); font-size: 10px; color:#5a6d7e;">R. Pedro Firmino</div>
+        <div class="map-label" style="top:48%; left:20%; transform:rotate(10deg);">Av. Rio Branco</div>
+        <div class="pin user" style="top:55%; left:55%;"></div>
     </div>
 
-    <div class="form-container sign-in-container">
-        <form action="#" method="post">
-            <div class="logo-container">
-                <i class="fas fa-car-side logo-icon"></i>
-                <div class="logo-text">Vaga<span>Livre</span></div>
+    <div class="sidebar collapsed" id="sidebar">
+        <div class="sheet-header" id="drag-zone">
+            <div class="drag-handle-container"><div class="drag-handle"></div></div>
+            <div class="search-wrapper">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Para onde vamos hoje?">
+                </div>
             </div>
-            <h1>Login</h1>
-            <input type="email" name="email" placeholder="Email" />
-            <input type="password" name="senha" placeholder="Senha" />
-            <a href="#">Esqueceu a senha?</a>
-            <button>Entrar</button>
-        </form>
-    </div>
+        </div>
 
-    <div class="overlay-container">
-        <div class="overlay">
-            <div class="overlay-panel overlay-left">
-                <h1>Já tem conta?</h1>
-                <p>Faça login para ver suas vagas.</p>
-                <button class="ghost" id="signIn">Entrar</button>
+        <div class="panel-content">
+            <div id="list-view">
+                <div class="quick-filters">
+                    <div class="filter-chip active">Tudo</div>
+                    <div class="filter-chip">Livres</div>
+                    <div class="filter-chip">Sombra</div>
+                </div>
+                <div class="suggestion-item">
+                    <div class="s-icon"><i class="fas fa-store"></i></div>
+                    <div><div style="font-weight:600; font-size:14px; color:#333">Comércio Central</div><div style="font-size:12px; color:#888;">R. Pedro Firmino</div></div>
+                </div>
             </div>
-            <div class="overlay-panel overlay-right">
-                <h1>Novo aqui?</h1>
-                <p>Cadastre-se e estacione fácil.</p>
-                <button class="ghost" id="signUp">Cadastrar</button>
+
+            <div id="details-view">
+                <div class="spot-header">
+                    <div><h2 id="spot-title" style="margin:0; font-size:22px; color:#333;">Vaga</h2><span style="font-size:12px; color:#666;">R. Pedro Firmino - Centro</span></div>
+                    <div class="spot-tag">LIVRE</div>
+                </div>
+                
+                <div class="camera-feed-container" id="cameraCarousel">
+                    <div class="camera-overlay"><i class="fas fa-circle"></i> AO VIVO</div>
+                    <img src="./image_0.png" class="camera-slide active" alt="Cam 1">
+                    <img src="./image_1.png" class="camera-slide" alt="Cam 2">
+                    <img src="./image_2.png" class="camera-slide" alt="Cam 3">
+                    
+                    <div style="position:absolute; z-index:-1; width:100%; height:100%; background:#333; display:flex; align-items:center; justify-content:center; color:#666;">
+                        <i class="fas fa-video-slash"></i>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom:20px; color:#555; font-size:14px;">
+                    <p><i class="fas fa-info-circle"></i> Vaga paralela, rotativo.</p>
+                    <p><i class="fas fa-clock"></i> Tempo máx: 2 horas</p>
+                </div>
+                <button class="btn-action">Navegar até aqui</button>
+                <button class="btn-cancel" onclick="backToList()">Voltar para busca</button>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    const signUpButton = document.getElementById('signUp');
-    const signInButton = document.getElementById('signIn');
-    const container = document.getElementById('container');
+    <script>
 
-    signUpButton.addEventListener('click', () => {
-        container.classList.add("right-panel-active");
-    });
+        // Fazemos aqui a ideia de bloquear Zoom de Pinça
+        document.addEventListener('touchmove', function (event) {
+            if (event.scale !== 1) { 
+                event.preventDefault(); 
+            }
+        }, { passive: false });
 
-    signInButton.addEventListener('click', () => {
-        container.classList.remove("right-panel-active");
-    });
-</script>
+        // Fazemos aqui a parte de bloquear Zoom de Duplo Toque
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
 
+        // Fazemo aqui a parte de bloquear Zoom por Gestos
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        const mapContainer = document.getElementById('map-container');
+        const sidebar = document.getElementById('sidebar');
+        const dragZone = document.getElementById('drag-zone');
+        const searchInput = document.getElementById('searchInput');
+        const listView = document.getElementById('list-view');
+        const detailsView = document.getElementById('details-view');
+        const spotTitle = document.getElementById('spot-title');
+
+        // Controle da parte do slideshow
+        let slideInterval;
+        let currentSlide = 0;
+
+        function startCameraCarousel() {
+            const slides = document.querySelectorAll('.camera-slide');
+            if (slides.length === 0) return;
+
+            // Garante que começa do zero
+            currentSlide = 0;
+            updateSlides(slides);
+
+            // Inicia o intervalo de 2 segundos
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                updateSlides(slides);
+            }, 2000);
+        }
+
+        function stopCameraCarousel() {
+            clearInterval(slideInterval);
+        }
+
+        function updateSlides(slides) {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+        }
+
+        // Trabalha a geração de vagas
+        function generateRandomSpots() {
+            const existingPins = document.querySelectorAll('.pin:not(.user)');
+            existingPins.forEach(pin => pin.remove());
+            
+            const numberOfSpots = 7;
+            for (let i = 0; i < numberOfSpots; i++) {
+                const pin = document.createElement('div');
+                const isFree = Math.random() > 0.4;
+                const progress = i / (numberOfSpots - 1);
+                const baseLeft = 40 + (progress * 20);
+                const baseTop = 10 + (progress * 80);
+                
+                pin.className = `pin ${isFree ? 'free' : 'occupied'}`;
+                pin.style.top = baseTop + '%'; pin.style.left = (baseLeft + (Math.random()*4 - 2)) + '%';
+                pin.innerHTML = `<i class="fas fa-${isFree ? 'check' : 'times'}"></i>`;
+
+                if (isFree) {
+                    pin.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openSpotDetails(`Vaga #${i + 200}`);
+                    });
+                }
+                mapContainer.appendChild(pin);
+            }
+        }
+
+        // Gerencia os estados
+        function setSidebarState(state) {
+            sidebar.classList.remove('collapsed', 'half-expanded', 'full-expanded');
+            if (state === 'collapsed') {
+                sidebar.classList.add('collapsed');
+                searchInput.blur();
+                stopCameraCarousel(); // PARAR ANIMAÇÃO
+                setTimeout(() => { if(sidebar.classList.contains('collapsed')) showListView(); }, 300);
+            } else if (state === 'half') {
+                sidebar.classList.add('half-expanded');
+                stopCameraCarousel(); // PARAR ANIMAÇÃO
+                showListView();
+            } else if (state === 'full') {
+                sidebar.classList.add('full-expanded');
+                // Dispara para animação começar na função openSpotDetails
+            }
+        }
+
+        function showListView() {
+            detailsView.style.display = 'none';
+            listView.style.display = 'block';
+        }
+
+        function openSpotDetails(title) {
+            spotTitle.innerText = title;
+            listView.style.display = 'none';
+            detailsView.style.display = 'block';
+            setSidebarState('full');
+            
+            // INICIAR ANIMAÇÃO
+            startCameraCarousel();
+        }
+
+        function backToList() {
+            setSidebarState('half');
+        }
+
+        // Parte dos eventos
+        searchInput.addEventListener('focus', () => { setSidebarState('half'); });
+        mapContainer.addEventListener('click', (e) => {
+            if (!e.target.closest('.pin')) { setSidebarState('collapsed'); }
+        });
+        
+        let startY = 0; let isDragging = false;
+        dragZone.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; });
+        dragZone.addEventListener('touchend', (e) => {
+            if (!isDragging) return; isDragging = false;
+            const dist = startY - e.changedTouches[0].clientY;
+            if (dist > 40) { if (sidebar.classList.contains('collapsed')) setSidebarState('half'); }
+            else if (dist < -40) { 
+                if (sidebar.classList.contains('full-expanded')) setSidebarState('half');
+                else if (sidebar.classList.contains('half-expanded')) setSidebarState('collapsed');
+            }
+        });
+
+        generateRandomSpots();
+    </script>
 </body>
 </html>
