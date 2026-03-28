@@ -37,7 +37,7 @@ error_reporting(E_ALL);
 if (!empty($_POST['email']))
 {
     $achou=false;
-    $sql="SELECT * FROM users WHERE email='".$login."'";
+    $sql="SELECT * FROM usuario WHERE email='".$login."'";
     $campos = $mysqli->query($sql);
     while($obj = $campos->fetch_object())
         $achou = true;
@@ -52,7 +52,7 @@ if (!empty($_POST['email']))
         if ($senha!=$confsenha)
             die();
 
-        $sql="INSERT INTO users (nome,email,senha,status,whatsapp) VALUES ('".$nome."','".$email."','".$senha."','ATIVO','".$whatsapp."')";
+        $sql="INSERT INTO usuario (nome,email,senha,status,whatsapp) VALUES ('".$nome."','".$email."','".$senha."','ATIVO','".$whatsapp."')";
         $result=$mysqli->query($sql);
         if ($result === TRUE)
             $last_id = $conn->insert_id;

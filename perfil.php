@@ -117,12 +117,17 @@ button {
     cursor:pointer;
 }
 
-.btn-logout {
-    background:#e74c3c;
+.botoes{
+    display:flex;
+    gap:10px;
 }
 
-.btn-cancel {
-    background:#999;
+.botoes button{
+    width:50%;
+}
+
+.btn-excluir{
+    background:#e74c3c;
 }
 </style>
 </head>
@@ -181,32 +186,31 @@ button {
 
         </div>
 
-        <!-- BOTÕES -->
-        <button type="button" id="btnEditar" onclick="editar()">Editar Perfil</button>
+       <!-- BOTÕES -->
+    <button type="button" id="btnEditar" onclick="editar()">
+    Editar Perfil
+    </button>
 
-        <button type="submit" id="btnSalvar" style="display:none;">Salvar</button>
+    <div class="botoes" id="grupoBotoes" style="display:none;">
 
-        <button type="button" class="btn-cancel" id="btnCancelar" onclick="cancelar()" style="display:none;">
-            Cancelar
+        <button type="submit" id="btnSalvar">
+            Salvar
         </button>
 
-        <button type="button" class="btn-logout" onclick="logout()">Sair da Conta</button>
-
-    </form>
+        <button 
+            type="submit"
+            name="excluir"
+            class="btn-excluir"
+            onclick="return confirm('Deseja realmente excluir sua conta?')">
+            Excluir
+        </button>
 
 </div>
 
 <script>
 
-function voltar(){
-    window.location.href = "dash.php";
-}
-
-function logout(){
-    window.location.href = "logout.php";
-}
-
 function editar(){
+
     // esconder textos
     document.getElementById("emailText").style.display = "none";
     document.getElementById("telText").style.display = "none";
@@ -215,14 +219,10 @@ function editar(){
     document.getElementById("emailInput").style.display = "block";
     document.getElementById("telInput").style.display = "block";
 
-    // botões
+    // trocar botões
     document.getElementById("btnEditar").style.display = "none";
-    document.getElementById("btnSalvar").style.display = "block";
-    document.getElementById("btnCancelar").style.display = "block";
-}
-
-function cancelar(){
-    location.reload();
+    document.getElementById("btnSalvar").style.display = "inline-block";
+    document.getElementById("btnExcluir").style.display = "inline-block";
 }
 
 </script>

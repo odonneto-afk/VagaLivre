@@ -46,7 +46,7 @@ if (isset($_GET['ns']))
     $idu=$_GET['idu'];
     if ($novasenha1==$novasenha2)
     {
-        $query = "update `users` SET
+        $query = "update `usuario` SET
         `senha` = '".sha1(md5($novasenha1))."'
             
         WHERE (`id` = ".$idu.")";
@@ -61,7 +61,10 @@ if (isset($_GET['ns']))
 
 if (!empty($_POST['email']))
 {
-    $sql="SELECT * FROM users WHERE status='ATIVO' and email='".$login."' and senha='".$senha."'";
+    $sql="SELECT * FROM usuario 
+          WHERE email='".$login."' 
+          and senha='".$senha."'";
+
 
     $campos = $mysqli->query($sql);
     while($obj = $campos->fetch_object())
@@ -91,15 +94,23 @@ if (!empty($_POST['email']))
 
     if (($achou)&&(!$criarSenha))
     {
-        if ($senhaConfere && $admin)
+        if ($senhaConfere)
         {
-            $query = "update `users` SET
+             // CRIA A SESSÃO DO USUÁRIO
+            $_SESSION['login'] = $login;
+            $_SESSION['senha'] = $senha;
+            $_SESSION['id'] = $cod;
+            $_SESSION['nome'] = $nome;
+
+            $query = "update `usuario` SET
             `ultimoacesso` = '$hojeBDcomHora'
                 
             WHERE (`id` = ".$cod.")";
             
             // Executa a query
             $atualiza2 = $mysqli->query($query);
+
+            header("Location: dash.php");
 
             if ($atualiza2){$mensagemErro = 'Acessando sistema, por favor aguarde...';}else{$mensagemErro = mysql_error();}
 
@@ -130,7 +141,7 @@ if (!empty($_POST['email']))
                 {
                     $autorizado = true;
 
-                    $query = "update `users` SET
+                    $query = "update `usuario` SET
                     `ultimoacesso` = '$hojeBDcomHora'
                         
                     WHERE (`id` = ".$cod.")";
