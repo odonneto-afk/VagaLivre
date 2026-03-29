@@ -220,9 +220,10 @@ function editar(){
     document.getElementById("telInput").style.display = "block";
 
     // trocar botões
+    document.getElementById("grupoBotoes").style.display = "flex";
     document.getElementById("btnEditar").style.display = "none";
-    document.getElementById("btnSalvar").style.display = "inline-block";
-    document.getElementById("btnExcluir").style.display = "inline-block";
+    //document.getElementById("btnSalvar").style.display = "inline-block";
+    //document.getElementById("btnExcluir").style.display = "inline-block";
 }
 
 </script>
