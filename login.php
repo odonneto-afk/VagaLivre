@@ -11,7 +11,7 @@ ob_start();
 
 if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
 {
-    header("Location:./");
+    header("Location:./perfil.php");
     exit();
 }
 
@@ -55,7 +55,7 @@ if (isset($_GET['ns']))
         $atualiza2 = $mysqli->query($query);
     }
     // die();
-    header('Location: ./');
+    header('Location: ./perfil.php');
 }
 
 
@@ -107,7 +107,7 @@ if (!empty($_POST['email']))
             $_SESSION['idcliente_login'] = $idcliente_login;
 
             $info = true;
-            header('Location: ./');
+            header('Location: ./perfil.php');
         }
     }
     else

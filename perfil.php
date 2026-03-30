@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("config.php");
+include("restrito.php");
 
 if (!isset($_SESSION['id'])) {
     header("Location: index.php");
