@@ -12,6 +12,7 @@ ob_start();
 if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
 {
     header("Location:./perfil.php");
+    header("Location:./perfil.php");
     exit();
 }
 
@@ -47,8 +48,10 @@ if (isset($_GET['ns']))
     if ($novasenha1==$novasenha2)
     {
         $query = "update `usuario` SET
+        $query = "update `usuario` SET
         `senha` = '".sha1(md5($novasenha1))."'
             
+        WHERE (`id_usuario` = ".$idu.")";
         WHERE (`id_usuario` = ".$idu.")";
         
         // Executa a query
@@ -56,17 +59,21 @@ if (isset($_GET['ns']))
     }
     // die();
     header('Location: ./perfil.php');
+    header('Location: ./perfil.php');
 }
 
 
 if (!empty($_POST['email']))
 {
     $sql="SELECT * FROM usuario WHERE email='".$login."' and senha='".$senha."'";
+    $sql="SELECT * FROM usuario WHERE email='".$login."' and senha='".$senha."'";
 
     $campos = $mysqli->query($sql);
     while($obj = $campos->fetch_object())
     {
         $achou = true;
+        $cod = $obj->id_usuario;
+        $idf = $obj->id_usuario;
         $cod = $obj->id_usuario;
         $idf = $obj->id_usuario;
         $nome = mb_strtoupper($obj->nome);
@@ -89,7 +96,9 @@ if (!empty($_POST['email']))
     if (($achou)&&(!$criarSenha))
     {
         if ($senhaConfere)
+        if ($senhaConfere)
         {
+           
            
             $autorizado = true;
             $lifetime_in_seconds = 10; // 3 horas
@@ -107,6 +116,7 @@ if (!empty($_POST['email']))
             $_SESSION['idcliente_login'] = $idcliente_login;
 
             $info = true;
+            header('Location: ./perfil.php');
             header('Location: ./perfil.php');
         }
     }
