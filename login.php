@@ -46,10 +46,10 @@ if (isset($_GET['ns']))
     $idu=$_GET['idu'];
     if ($novasenha1==$novasenha2)
     {
-        $query = "update `users` SET
+        $query = "update `usuario` SET
         `senha` = '".sha1(md5($novasenha1))."'
             
-        WHERE (`id` = ".$idu.")";
+        WHERE (`id_usuario` = ".$idu.")";
         
         // Executa a query
         $atualiza2 = $mysqli->query($query);
@@ -61,18 +61,15 @@ if (isset($_GET['ns']))
 
 if (!empty($_POST['email']))
 {
-    $sql="SELECT * FROM users WHERE status='ATIVO' and email='".$login."' and senha='".$senha."'";
+    $sql="SELECT * FROM usuario WHERE email='".$login."' and senha='".$senha."'";
 
     $campos = $mysqli->query($sql);
     while($obj = $campos->fetch_object())
     {
         $achou = true;
-        $cod = $obj->id;
-        $idf = $obj->id;
+        $cod = $obj->id_usuario;
+        $idf = $obj->id_usuario;
         $nome = mb_strtoupper($obj->nome);
-        $nivel[$contcursos] = $obj->nivel;
-        if ($nivel[$contcursos] <= 3){ $admin = true;}
-        if ($nivel[$contcursos] < 1){ header("Location: logout.php");}
         $senha_atual = $obj->senha;
 
         if ($senha_atual=='ec3d95d4e9d53a99e06bf6914bdd019c36fe4bb3')
@@ -91,18 +88,9 @@ if (!empty($_POST['email']))
 
     if (($achou)&&(!$criarSenha))
     {
-        if ($senhaConfere && $admin)
+        if ($senhaConfere)
         {
-            $query = "update `users` SET
-            `ultimoacesso` = '$hojeBDcomHora'
-                
-            WHERE (`id` = ".$cod.")";
-            
-            // Executa a query
-            $atualiza2 = $mysqli->query($query);
-
-            if ($atualiza2){$mensagemErro = 'Acessando sistema, por favor aguarde...';}else{$mensagemErro = mysql_error();}
-
+           
             $autorizado = true;
             $lifetime_in_seconds = 10; // 3 horas
             ini_set('session.gc_maxlifetime', 10); 
@@ -120,50 +108,6 @@ if (!empty($_POST['email']))
 
             $info = true;
             header('Location: ./');
-        }
-        else
-        {
-            if (1==2)
-            if (!empty($senha_atual))
-            {
-                if ($senhaConfere)
-                {
-                    $autorizado = true;
-
-                    $query = "update `users` SET
-                    `ultimoacesso` = '$hojeBDcomHora'
-                        
-                    WHERE (`id` = ".$cod.")";
-                    
-                    // Executa a query
-                    $atualiza2 = $mysqli->query($query);
-
-                    if ($atualiza2){header('Location: ./');}else{$mensagemErro = mysql_error();}
-                            
-                    $lifetime_in_seconds = 10800; // 3 horas
-                    ini_set('session.gc_maxlifetime', 10800); 
-                    // session_set_cookie_params($lifetime_in_seconds);
-                    // setcookie(session_name(), session_id(), time() + $lifetime_in_seconds);
-
-                    session_start();
-                    $_SESSION['start_time'] = time();
-                    $_SESSION['expiry_time'] = $lifetime_in_seconds;
-
-                    $_SESSION['login'] = $login;
-                    $_SESSION['senha'] = $senha;
-                    $_SESSION['id'] = $idf;
-                    $_SESSION['idcliente_login'] = $idcliente_login;
-                    $info = true;
-    
-                    header('Location: ./');
-    
-    
-                }
-
-            }
-            else
-                $criarSenha = true;
-
         }
     }
     else
