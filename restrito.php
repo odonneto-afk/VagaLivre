@@ -44,7 +44,7 @@ else
 
 if ($login_usuario!="")
 {
-	$bdu = $mysqli->query ("SELECT * FROM users");
+	$bdu = $mysqli->query ("SELECT * FROM usuario");
 	while($campo = $bdu->fetch_object())
 	{
 		if (strcasecmp(strtoupper($login_usuario),strtoupper($campo->email))==0)
