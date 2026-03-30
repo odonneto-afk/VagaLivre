@@ -48,10 +48,8 @@ if (isset($_GET['ns']))
     if ($novasenha1==$novasenha2)
     {
         $query = "update `usuario` SET
-        $query = "update `usuario` SET
         `senha` = '".sha1(md5($novasenha1))."'
             
-        WHERE (`id_usuario` = ".$idu.")";
         WHERE (`id_usuario` = ".$idu.")";
         
         // Executa a query
