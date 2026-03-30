@@ -10,23 +10,29 @@ if (!isset($_SESSION['id'])) {
 
 $id = $_SESSION['id'];
 
-// SALVAR DADOS (quando clicar em salvar)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $telefone = $_POST['telefone'];
+// --- SALVAR ALTERAÇÕES ---
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar'])) {
+    $nome = $mysqli->real_escape_string($_POST['nome']);
+    $email = $mysqli->real_escape_string($_POST['email']);
+    $telefone = $mysqli->real_escape_string($_POST['telefone']);
 
-    $sqlUpdate = "UPDATE usuario SET 
-        email = '$email',
-        telefone = '$telefone'
-        WHERE id_usuario = $id";
-
+    $sqlUpdate = "UPDATE usuario SET nome = '$nome', email = '$email', telefone = '$telefone' WHERE id_usuario = $id";
     $mysqli->query($sqlUpdate);
-
-    header("Location: perfil.php");
+    header("Location: perfil.php?atualizado=1");
     exit();
 }
 
-// BUSCAR DADOS
+// ---  EXCLUIR PERFIL ---
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['excluir'])) {
+    $sqlDelete = "DELETE FROM usuario WHERE id_usuario = $id";
+    if ($mysqli->query($sqlDelete)) {
+        session_destroy();
+        header("Location: index.php");
+        exit();
+    }
+}
+
+// --- BUSCAR DADOS PARA EXIBIR ---
 $sql = "SELECT * FROM usuario WHERE id_usuario = $id";
 $result = $mysqli->query($sql);
 $user = $result->fetch_assoc();
@@ -35,199 +41,200 @@ $user = $result->fetch_assoc();
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Perfil - VagaLivre</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VagaLivre - Dados Pessoais</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 40px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-<style>
-body {
-    margin:0;
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg,#2b5876,#4e4376);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A2B4D; /* Azul escuro do ícone */
+        }
 
-.card {
-    background:#fff;
-    padding:30px;
-    border-radius:20px;
-    width:340px;
-    text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    position: relative;
-}
+        .logo span { color: #2DAB61; } /* Verde do 'Livre' */
 
-.back {
-    position:absolute;
-    left:15px;
-    top:15px;
-    font-size:18px;
-    color:#555;
-    cursor:pointer;
-}
+        .user-nav-icon {
+            color: #2DAB61;
+            font-size: 26px;
+        }
 
-.avatar {
-    width:90px;
-    height:90px;
-    background:#2ecc71;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:35px;
-    color:#fff;
-    margin:10px auto 15px;
-}
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+        }
 
-h2 { margin:10px 0 5px; }
+        .back-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 15px;
+        }
 
-.info {
-    text-align:left;
-    margin-top:20px;
-}
+        .back-link {
+            text-decoration: none;
+            color: #2DAB61;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.info p {
-    margin:10px 0;
-    font-size:14px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+        
+        .card {
+            background: white;
+            width: 90%;
+            max-width: 580px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+        }
 
-input {
-    width:100%;
-    padding:8px;
-    border-radius:8px;
-    border:1px solid #ccc;
-}
+        .card-header { margin-bottom: 25px; }
+        .card-header i { font-size: 55px; color: #000; margin-bottom: 10px; }
+        .card-header h1 { font-size: 26px; margin: 0; font-weight: 700; }
 
-button {
-    margin-top:10px;
-    padding:12px;
-    width:100%;
-    border:none;
-    border-radius:10px;
-    background:#4e4376;
-    color:#fff;
-    font-weight:bold;
-    cursor:pointer;
-}
+       
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
 
-.botoes{
-    display:flex;
-    gap:10px;
-}
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 5px;
+            padding-left: 2px;
+        }
 
-.botoes button{
-    width:50%;
-}
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: none;
+            background-color: #E9ECEF; /* Cinza dos inputs do Figma */
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+            color: #495057;
+        }
 
-.btn-excluir{
-    background:#e74c3c;
-}
-</style>
+        
+        .readonly-input {
+            cursor: not-allowed;
+            color: #999 !important;
+        }
+
+        /* Botões */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
+
+        .btn {
+            padding: 10px 35px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .btn-excluir {
+            background: transparent;
+            border: 1.5px solid #FF6B6B;
+            color: #FF6B6B;
+        }
+
+        .btn-salvar {
+            background: #D1E7DD; /* Verde claro do botão Salvar */
+            color: #0F5132;
+            padding: 10px 50px;
+        }
+
+        .btn:hover { opacity: 0.8; }
+
+    </style>
 </head>
-
 <body>
 
-<div class="card">
+<header class="navbar">
+    <div class="logo">
+        <i class="fa-solid fa-car-side"></i> Vaga<span>Livre</span>
+    </div>
+    <div class="user-nav-icon">
+        <i class="fa-solid fa-circle-user"></i>
+    </div>
+</header>
 
-    <div class="back" onclick="voltar()">
-        <i class="fas fa-arrow-left"></i>
+<div class="content">
+    <div class="back-container">
+        <a href="dashboard.php" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+        </a>
     </div>
 
-    <div class="avatar">
-        <i class="fas fa-user"></i>
-    </div>
-
-    <h2><?php echo $user['nome']; ?></h2>
-
-    <form method="POST">
-
-        <div class="info">
-
-            <!-- EMAIL -->
-            <p>
-                <i class="fas fa-envelope"></i>
-
-                <span id="emailText"><?php echo $user['email']; ?></span>
-
-                <input 
-                    type="text" 
-                    name="email"
-                    id="emailInput" 
-                    value="<?php echo $user['email']; ?>" 
-                    style="display:none;"
-                >
-            </p>
-
-            <!-- TELEFONE -->
-            <p>
-                <i class="fas fa-phone"></i>
-
-                <span id="telText"><?php echo $user['telefone']; ?></span>
-
-                <input 
-                    type="text" 
-                    name="telefone"
-                    id="telInput" 
-                    value="<?php echo $user['telefone']; ?>" 
-                    style="display:none;"
-                >
-            </p>
-
-            <p>
-                <i class="fas fa-id-card"></i> ID: <?php echo $user['id_usuario']; ?>
-            </p>
-
+    <section class="card">
+        <div class="card-header">
+            <i class="fa-solid fa-circle-user"></i>
+            <h1>Dados Pessoais</h1>
         </div>
 
-       <!-- BOTÕES -->
-    <button type="button" id="btnEditar" onclick="editar()">
-    Editar Perfil
-    </button>
+        <form method="POST">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" name="nome" value="<?php echo htmlspecialchars($user['nome']); ?>" required>
+            </div>
 
-    <div class="botoes" id="grupoBotoes" style="display:none;">
+            <div class="form-group">
+                <label>Telefone</label>
+                <input type="text" name="telefone" value="<?php echo htmlspecialchars($user['telefone']); ?>" required>
+            </div>
 
-        <button type="submit" id="btnSalvar">
-            Salvar
-        </button>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+            </div>
 
-        <button 
-            type="submit"
-            name="excluir"
-            class="btn-excluir"
-            onclick="return confirm('Deseja realmente excluir sua conta?')">
-            Excluir
-        </button>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" value="********" readonly class="readonly-input">
+            </div>
 
+            <div class="actions">
+                <button type="submit" name="excluir" class="btn btn-excluir" onclick="return confirm('Tem certeza que deseja excluir seu perfil?')">
+                    Excluir perfil
+                </button>
+                <button type="submit" name="salvar" class="btn btn-salvar">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </section>
 </div>
-
-<script>
-
-function editar(){
-
-    // esconder textos
-    document.getElementById("emailText").style.display = "none";
-    document.getElementById("telText").style.display = "none";
-
-    // mostrar inputs
-    document.getElementById("emailInput").style.display = "block";
-    document.getElementById("telInput").style.display = "block";
-
-    // trocar botões
-    document.getElementById("grupoBotoes").style.display = "flex";
-    document.getElementById("btnEditar").style.display = "none";
-    //document.getElementById("btnSalvar").style.display = "inline-block";
-    //document.getElementById("btnExcluir").style.display = "inline-block";
-}
-
-</script>
 
 </body>
 </html>
