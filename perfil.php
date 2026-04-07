@@ -192,7 +192,7 @@ $user = $result->fetch_assoc();
 
 <div class="content">
     <div class="back-container">
-        <a href="dashboard.php" class="back-link">
+        <a href="./" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Voltar
         </a>
     </div>
