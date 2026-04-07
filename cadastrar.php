@@ -57,7 +57,6 @@ if (!empty($_POST['email']))
         if ($result === TRUE)
             $last_id = $mysqli->insert_id;
 
-
         $autorizado = true;
         $lifetime_in_seconds = 10; // 3 horas
         ini_set('session.gc_maxlifetime', 10); 

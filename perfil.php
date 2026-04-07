@@ -3,12 +3,13 @@ session_start();
 include("config.php");
 include("restrito.php");
 
-if (!isset($_SESSION['id'])) {
-    header("Location: index.php");
-    exit();
-}
+if ($_SERVER['REQUEST_METHOD'] != 'POST') 
+    if (!isset($_SESSION['id'])) {
+        header("Location: index.php");
+        exit();
+    }
 
-$id = $_SESSION['id'];
+$id = $login_usuario_id;
 
 // --- SALVAR ALTERAÇÕES ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar'])) {
@@ -26,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['salvar'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['excluir'])) {
     $sqlDelete = "DELETE FROM usuario WHERE id_usuario = $id";
     if ($mysqli->query($sqlDelete)) {
-        session_destroy();
-        header("Location: index.php");
+       
+        header("Location: logout.php");
         exit();
     }
 }
@@ -203,7 +204,7 @@ $user = $result->fetch_assoc();
             <h1>Dados Pessoais</h1>
         </div>
 
-        <form method="POST">
+        <form method="POST" action="perfil.php?id=<php echo $login_usuario_id ?>">
             <div class="form-group">
                 <label>Nome</label>
                 <input type="text" name="nome" value="<?php echo htmlspecialchars($user['nome']); ?>" required>

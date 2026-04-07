@@ -5,7 +5,7 @@ $password = "5>YoFssoy>O";
 
 error_reporting(1);
 ob_start();
-$mysqli = new mysqli("localhost",$username,$password,$database);
+$mysqli = new mysqli("193.203.175.53",$username,$password,$database);
 
 // Check connection
 if ($mysqli -> connect_errno) {
