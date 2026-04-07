@@ -11,7 +11,7 @@ ob_start();
 
 if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
 {
-    header("Location:./perfil.php");
+    header("Location:./home.php");
     exit();
 }
 
