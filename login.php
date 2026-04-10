@@ -8,12 +8,12 @@ $senha = "";
 ob_start();
 @session_start();
 
-
-if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
-{
-    header("Location:./home.php");
-    exit();
-}
+if (!isset($_GET['cd_st']))
+    if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
+    {
+        header("Location:./perfil.php");
+        exit();
+    }
 
 
 if (!empty($_POST['email']))
@@ -54,8 +54,7 @@ if (isset($_GET['ns']))
         // Executa a query
         $atualiza2 = $mysqli->query($query);
     }
-    // die();
-    header('Location: ./perfil.php');
+    $info = true;
 }
 
 
@@ -90,6 +89,7 @@ if (!empty($_POST['email']))
     {
         if ($senhaConfere)
         {
+            @session_destroy();
            
             $autorizado = true;
             $lifetime_in_seconds = 10; // 3 horas
@@ -97,23 +97,22 @@ if (!empty($_POST['email']))
             // session_set_cookie_params($lifetime_in_seconds);
             // setcookie(session_name(), session_id(), time() + $lifetime_in_seconds);
 
-            session_start();
+            @session_start();
             $_SESSION['start_time'] = time();
             $_SESSION['expiry_time'] = time()+$lifetime_in_seconds;
 
-            $_SESSION['login'] = $login;
-            $_SESSION['senha'] = $senha;
-            $_SESSION['id'] = $idf;
-            $_SESSION['idcliente_login'] = $idcliente_login;
+            @$_SESSION['login'] = $login;
+            @$_SESSION['senha'] = $senha;
+            @$_SESSION['id'] = $idf;
+            @$_SESSION['idcliente_login'] = $idcliente_login;
+            header("Location:./perfil.php");
 
             $info = true;
-            header('Location: ./perfil.php');
         }
     }
     else
-    {
         $erro = true;
-    }
+    
 }
 ?>
 
@@ -592,9 +591,9 @@ if (!empty($_POST['email']))
             <h1>Login</h1>
             <input type="email" name="email" placeholder="Email" />
             <input type="password" name="senha" placeholder="Senha" />
-            <a href="redefinirsenha.php" style="color: #666; font-size: 13px; text-decoration: none; margin: 15px 0; display: block;">
-    Esqueceu a senha?
-</a>
+            <a href="./redefinirsenha.php" style="color: #666; font-size: 13px; text-decoration: none; margin: 15px 0; display: block;">
+                Esqueceu a senha?
+            </a>
             <button>Entrar</button>
         </form>
     </div>
@@ -615,6 +614,13 @@ if (!empty($_POST['email']))
     </div>
 </div>
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
 <script>
     const signUpButton = document.getElementById('signUp');
     const signInButton = document.getElementById('signIn');
@@ -627,6 +633,45 @@ if (!empty($_POST['email']))
     signInButton.addEventListener('click', () => {
         container.classList.remove("right-panel-active");
     });
+
+<?php if (@$_GET['cd_st']==1){ ?>
+    Swal.fire({
+            title: 'Sucesso!',
+            text: 'Cadastro realizado com sucesso!',
+            icon: 'success',
+            confirmButtonText: 'Continuar',
+            confirmButtonColor: '#3085d6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'perfil.php';
+            }
+        });
+<?php } ?>
+
+<?php if (@$_GET['cd_st']==2){ ?>
+    Swal.fire({
+        title: "Email em uso",
+        text: "Esse email já está em uso!",
+        icon: "error"
+    });
+<?php } ?>
+
+<?php if (@$_GET['cd_st']==3){ ?>
+    Swal.fire({
+        title: "Senha muito fraca",
+        text: "A senha precisa ter pelo menos 1 simbolo, 1 letra maiuscula, 1 letra minúscula, 1 número e 8 caracteres !",
+        icon: "error"
+    });
+<?php } ?>
+
+<?php if (@$_GET['cd_st']==4){ ?>
+    Swal.fire({
+        title: "Senhas não conferem",
+        text: "As senhas não coincidem, tente novamente!",
+        icon: "error"
+    });
+<?php } ?>
+
 </script>
 
 </body>

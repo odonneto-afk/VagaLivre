@@ -7,6 +7,7 @@ $login = "";
 $senha = "";
 ob_start();
 @session_start();
+session_destroy();
 
 
 if (!empty($_POST['email']))
@@ -26,6 +27,7 @@ $erro = false;
 $senhaConfere = false;
 $manutencao = false;
 $periodo = false;
+$status = 0;
 
 
 ini_set('display_errors',1);
@@ -34,48 +36,82 @@ error_reporting(E_ALL);
 
 
 
-if (!empty($_POST['email']))
-{
-    $achou=false;
-    $sql="SELECT * FROM usuario WHERE email='".$login."'";
-    $campos = $mysqli->query($sql);
-    while($obj = $campos->fetch_object())
-        $achou = true;
-    if (!$achou)
-    {
-        $nome=$_POST['nome'];
-        $email=$_POST['email'];
-        $senha=sha1(md5($_POST['senha']));
-        $confsenha=sha1(md5($_POST['confsenha']));
-        $whatsapp=$_POST['whatsapp'];
+function validarSenha($senha) {
+    // Regras:
+    // (?=.*[a-z]) : Pelo menos uma letra minúscula
+    // (?=.*[A-Z]) : Pelo menos uma letra maiúscula
+    // (?=.*[0-9]) : Pelo menos um número
+    // (?=.*[!@#$%^&*(),.?":{}|<>]) : Pelo menos um caractere especial
+    // .{8,}       : No mínimo 8 caracteres no total
+    
+    $padrao = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/';
 
-        if ($senha!=$confsenha)
-            die();
-
-        $sql="INSERT INTO usuario (nome,email,senha,telefone) VALUES ('".$nome."','".$email."','".$senha."','".$whatsapp."')";
-        $result=$mysqli->query($sql);
-        if ($result === TRUE)
-            $last_id = $mysqli->insert_id;
-
-        $autorizado = true;
-        $lifetime_in_seconds = 10; // 3 horas
-        ini_set('session.gc_maxlifetime', 10); 
-        // session_set_cookie_params($lifetime_in_seconds);
-        // setcookie(session_name(), session_id(), time() + $lifetime_in_seconds);
-
-        ob_start();
-        session_start();
-        $_SESSION['start_time'] = time();
-        $_SESSION['expiry_time'] = time()+$lifetime_in_seconds;
-
-        $_SESSION['login'] = $login;
-        $_SESSION['senha'] = $senha;
-        $_SESSION['id'] = $last_id;
-        $_SESSION['idcliente_login'] = $last_id;
-
-
-
-    }
+    return preg_match($padrao, $senha);
 }
-header('Location: ./');
+
+
+
+if (!empty($_POST['email'])) {
+    $achou = false;
+
+    $sql = "SELECT * FROM usuario WHERE email='" . $mysqli->real_escape_string($_POST['email']) . "'";
+    $campos = $mysqli->query($sql);
+    
+    if ($campos && $campos->num_rows > 0)
+        $achou = true;
+
+    $achou = false;
+
+    if (!$achou) {
+        $senha_pura = $_POST['senha'];
+        $confsenha_pura = $_POST['confsenha'];
+        
+        // Validação da força da senha
+        if (!validarSenha($senha_pura))
+            $status = 3; // Senha fraca
+    
+        // Validação de igualdade
+        elseif ($senha_pura !== $confsenha_pura)
+            $status = 4; // Senhas não conferem (crie esse status se não houver)
+        
+        else {
+            // Se passou nas validações, prossegue com o cadastro
+            $nome = $_POST['nome'];
+            $email = $_POST['email'];
+            $senha = sha1(md5($senha_pura));
+            $whatsapp = $_POST['whatsapp'];
+
+            $sql = "INSERT INTO usuario (nome, email, senha, telefone) VALUES ('$nome', '$email', '$senha', '$whatsapp')";
+            $result = $mysqli->query($sql);
+
+            if ($result === TRUE) {
+                $status = 1;
+                $last_id = $mysqli->insert_id;
+
+                // Início da Sessão
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+                
+                $lifetime_in_seconds = 3600 * 3; // 3 horas (ajustado de 10s para algo útil)
+                $_SESSION['start_time'] = time();
+                $_SESSION['expiry_time'] = time() + $lifetime_in_seconds;
+                $_SESSION['login'] = $email;
+                $_SESSION['senha'] = $senha;
+                $_SESSION['id'] = $last_id;
+                $_SESSION['idcliente_login'] = $last_id;
+                
+                $autorizado = true;
+            } else
+                echo "Erro no banco: " . $mysqli->error;
+            
+        }
+    } else
+        $status = 2; // Email já cadastrado
+
+}
+
+
+header('Location: ./login.php?cd_st='.$status);
+
 ?>

@@ -1,3 +1,10 @@
+<?php
+session_start();
+include("config.php");
+include("restrito.php");
+
+
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -38,7 +45,7 @@
             padding: 0 20px;
         }
 
-        /* HEADER */
+        /* HEADER IDENTICO À HOME */
         .main-header {
             padding: 15px 0;
             border-bottom: 1px solid #eee;
@@ -54,6 +61,7 @@
         .logo-container {
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         .logo-icon {
@@ -211,12 +219,14 @@
 
     <header class="main-header">
         <div class="container header-content">
-            <div class="logo-container">
+            <a href="home.php" class="logo-container">
                 <i class="fas fa-car-side logo-icon"></i>
                 <div class="logo-text">Vaga<span>Livre</span></div>
-            </div>
+            </a>
             <div class="user-profile">
-                <i class="fas fa-user-circle"></i>
+                <a href="perfil.php" class="logo-container">
+                    <i class="fas fa-user-circle"></i>
+                </a>
             </div>
         </div>
     </header>

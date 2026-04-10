@@ -229,7 +229,9 @@ $user = $result->fetch_assoc();
                 <div class="logo-text">Vaga<span>Livre</span></div>
             </a>
             <div class="user-profile">
-                <i class="fas fa-user-circle"></i>
+                <a href="perfil.php" class="logo-container">
+                    <i class="fas fa-user-circle"></i>
+                </a>
             </div>
         </div>
     </header>
