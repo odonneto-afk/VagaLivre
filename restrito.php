@@ -1,7 +1,7 @@
 <?php
 @session_start();
 // 1. Define o tempo máximo de inatividade (ex: 30 minutos = 1800 segundos)
-$tempo_limite = 10; 
+$tempo_limite = 60; 
 
 // 2. Configura o PHP para aceitar esse tempo antes do Garbage Collector agir
 ini_set('session.gc_maxlifetime', $tempo_limite);

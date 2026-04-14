@@ -11,7 +11,7 @@ ob_start();
 if (!isset($_GET['cd_st']))
     if (isset($_SESSION["login"]) && isset($_SESSION["senha"]))
     {
-        header("Location:./perfil.php");
+        header("Location:./home.php");
         exit();
     }
 
@@ -92,8 +92,8 @@ if (!empty($_POST['email']))
             @session_destroy();
            
             $autorizado = true;
-            $lifetime_in_seconds = 10; // 3 horas
-            ini_set('session.gc_maxlifetime', 10); 
+            $lifetime_in_seconds = 60; // 3 horas
+            ini_set('session.gc_maxlifetime', 60); 
             // session_set_cookie_params($lifetime_in_seconds);
             // setcookie(session_name(), session_id(), time() + $lifetime_in_seconds);
 
@@ -105,7 +105,7 @@ if (!empty($_POST['email']))
             @$_SESSION['senha'] = $senha;
             @$_SESSION['id'] = $idf;
             @$_SESSION['idcliente_login'] = $idcliente_login;
-            header("Location:./perfil.php");
+            header("Location:./home.php");
 
             $info = true;
         }
@@ -643,7 +643,7 @@ if (!empty($_POST['email']))
             confirmButtonColor: '#3085d6'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = 'perfil.php';
+                window.location.href = 'home.php';
             }
         });
 <?php } ?>

@@ -93,7 +93,7 @@ if (!empty($_POST['email'])) {
                     session_start();
                 }
                 
-                $lifetime_in_seconds = 3600 * 3; // 3 horas (ajustado de 10s para algo útil)
+                $lifetime_in_seconds = 60; // 3 horas (ajustado de 10s para algo útil)
                 $_SESSION['start_time'] = time();
                 $_SESSION['expiry_time'] = time() + $lifetime_in_seconds;
                 $_SESSION['login'] = $email;
