@@ -1,7 +1,7 @@
 <?php
 $database = "u574397572_vagalivre";
 $username = "u574397572_vagalivre";
-$password = "5>YoFssoy>O";
+$password = "fff";
 
 error_reporting(1);
 ob_start();
