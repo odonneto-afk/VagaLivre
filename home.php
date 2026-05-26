@@ -1,10 +1,58 @@
 <?php
 session_start();
-include("config.php");
+
+// =========================================================================
+// 1. PADRÃO CRIACIONAL: SINGLETON (Implementado para gerenciar a conexão)
+// =========================================================================
+class ConexaoBD {
+    private static $instancia = null;
+    private $mysqli;
+
+    private function __construct() {
+        // Dados de conexão fictícios/reais
+        $this->mysqli = new mysqli("localhost", "root", "", "vagalivre");
+    }
+
+    public static function getInstance() {
+        if (self::$instancia === null) {
+            self::$instancia = new ConexaoBD();
+        }
+        return self::$instancia;
+    }
+
+    public function getConnection() {
+        return $this->mysqli;
+    }
+}
+
+
+$dbInstance = ConexaoBD::getInstance();
+$mysqli = $dbInstance->getConnection();
+
+// =========================================================================
+// 2. PADRÃO ESTRUTURAL: PAGE CONTROLLER
+// =========================================================================
+// O arquivo home.php age como o controlador da página: processa requisições,
+// trata segurança (restrito) e decide o que renderizar.
 include("restrito.php");
 
+$link_perfil = "perfil.php";
+if ($login_usuario_id == 1) {
+    $link_perfil = "superusuario.php";
+}
 
+$dados = [];
+// Executando a query através da conexão segura provida pelo Singleton
+$sql2 = "SELECT * FROM monitoramento m 
+         INNER JOIN camera c ON c.id_camera=m.id_camera 
+         INNER JOIN area a ON a.id_area=m.id_area;";
+$campos2 = $mysqli->query($sql2);
+
+while($obj2 = $campos2->fetch_object()) {
+    array_push($dados, (array) $obj2);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -162,7 +210,7 @@ include("restrito.php");
         .card-image {
             width: 100%;
             height: 100%;
-            background-image: url('img/av-vidal.jpg'); 
+            background-image: url('./Img/av-vidal.jpg'); 
             background-size: cover;
             background-position: center;
         }
@@ -214,6 +262,11 @@ include("restrito.php");
             }
         }
     </style>
+
+    <!-- CSS do SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
 </head>
 <body>
 
@@ -221,13 +274,16 @@ include("restrito.php");
         <div class="container header-content">
             <a href="home.php" class="logo-container">
                 <i class="fas fa-car-side logo-icon"></i>
+         
+                
                 <div class="logo-text">Vaga<span>Livre</span></div>
             </a>
-            <div class="user-profile">
-                <a href="perfil.php" class="logo-container">
+            <div class="user-profile" style='right: 50px;position: absolute;'>
+                <a href="<?php echo $link_perfil ?>" class="logo-container">
                     <i class="fas fa-user-circle"></i>
                 </a>
             </div>
+             
         </div>
     </header>
 
@@ -239,16 +295,18 @@ include("restrito.php");
                 <input type="text" id="searchInput" placeholder="Buscar área monitorada...">
             </div>
         <section class="grid-areas" id="gridAreas" style="margin-top: 40px;">
-    
-        <a href="visualizar_area.php" class="area-card" data-name="avenida vidal de negreiros">
+
+        <?php foreach ($dados as $key => $value){ ?>
+        <a href="./?id=<?php echo $value['id_monitoramento'] ?>" class="area-card" data-name="<?php echo $value['nome_area'].' ('.$value['localizacao'].')'  ?>">
             <div class="card-image"></div>
             <div class="card-labels">
-                <div class="location-tag">Avenida Vidal de Negreiros</div>
+                <div class="location-tag"><?php echo $value['nome_area'].' ('.$value['localizacao'].')' ?></div>
                 <div class="action-icon">
                     <i class="fas fa-arrow-up-right-from-square"></i>
                 </div>
             </div>
         </a>
+        <?php } ?>
 
         <div id="no-results" style="display: none; text-align: center; padding: 40px; width: 100%; grid-column: 1 / -1; color: #999;">
             <i class="fas fa-search-minus" style="font-size: 40px; margin-bottom: 10px; display: block; color: var(--accent-green);"></i>
@@ -259,29 +317,31 @@ include("restrito.php");
 
     </main>
 
+    <!-- JS do SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const searchInput = document.getElementById('searchInput');
         const cards = document.querySelectorAll('.area-card');
-        const noResults = document.getElementById('no-results');
 
+        // O 'searchInput' é o SUJEITO (Subject). 
+        // O addEventListener registra a função abaixo como um OBSERVADOR (Observer).
         searchInput.addEventListener('input', () => {
             const filter = searchInput.value.toLowerCase();
-            let found = false;
 
+            // Sempre que o estado do sujeito muda (usuário digita),
+            // todos os observadores (cards) são notificados e atualizam seu comportamento.
             cards.forEach(card => {
                 const name = card.getAttribute('data-name').toLowerCase();
                 if (name.includes(filter)) {
-                    card.style.display = "block";
-                    found = true;
+                    card.style.display = "block"; // Reage exibindo
                 } else {
-                    card.style.display = "none";
+                    card.style.display = "none";  // Reage escondendo
                 }
             });
-
-            // Mostra a mensagem se 'found' for falso
-            noResults.style.display = found ? "none" : "block";
         });
+
+
     </script>
 </body>
 </html>
